@@ -41,7 +41,7 @@ func main() {
 
 
 	server := &http.Server{
-		Addr:     443,
+		Addr:     "443",
 		Handler:  api.NewRouter(config.Get()),
 		ErrorLog: logger.Error,
 	}
