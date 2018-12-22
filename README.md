@@ -6,6 +6,8 @@
 
 A very simple webhook server to launch shell scripts.
 
+Slightly modified to add HTTPS with certmagic (Let's Encrypt)
+
 ![Logo](webhookd.svg)
 
 ## Installation
