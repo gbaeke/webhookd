@@ -12,6 +12,8 @@ import (
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/worker"
+	"github.com/mholt/certmagic"
+
 )
 
 func main() {
@@ -31,9 +33,15 @@ func main() {
 	logger.Init(level)
 
 	logger.Debug.Println("Starting webhookd server...")
+	
+	// certmagic
+        certmagic.Agreed = true
+        certmagic.Email = "mail@mail.com"
+        certmagic.CA = certmagic.LetsEncryptProductionCA
+
 
 	server := &http.Server{
-		Addr:     *conf.ListenAddr,
+		Addr:     443,
 		Handler:  api.NewRouter(config.Get()),
 		ErrorLog: logger.Error,
 	}
@@ -63,9 +71,10 @@ func main() {
 
 	logger.Info.Println("Server is ready to handle requests at", *conf.ListenAddr)
 	api.Start()
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error.Fatalf("Could not listen on %s: %v\n", *conf.ListenAddr, err)
-	}
+        if err := certmagic.HTTPS([]string{"www.example.com"}, server.Handler); err != nil {
+                logger.Error.Fatalf("Could not listen on %s: %v\n", *conf.ListenAddr, err)
+        }
+
 
 	<-done
 	logger.Debug.Println("Server stopped")
